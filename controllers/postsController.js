@@ -38,9 +38,18 @@ function index(req, res) {
 
 // * SHOW
 function show(req, res) {
-  const id = parseInt(req.params.id);
-  const findedPost = findPostById(res, id);
-  res.json(findedPost);
+  // const id = parseInt(req.params.id);
+  // const findedPost = findPostById(res, id);
+  // res.json(findedPost);
+
+  const id = req.params.id;
+  const sqlShow = "SELECT * FROM posts WHERE id = ?";
+  connection.query(sqlShow, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: "Query failed!" });
+    if (results.length === 0)
+      return res.status(404).json({ error: "Posts not found" });
+    res.json(results[0]);
+  });
 }
 
 // * STORE

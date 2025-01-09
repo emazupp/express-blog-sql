@@ -77,11 +77,19 @@ function modify(req, res) {
 
 // * DESTROY
 function destroy(req, res) {
-  const id = parseInt(req.params.id);
-  const indexOfFindedPost = posts.indexOf(findPostById(res, id));
-  posts.splice(indexOfFindedPost, 1);
-  res.json("Elemento eliminato");
-  res.sendStatus(204);
+  // const id = parseInt(req.params.id);
+  // const indexOfFindedPost = posts.indexOf(findPostById(res, id));
+  // posts.splice(indexOfFindedPost, 1);
+  // res.json("Elemento eliminato");
+  // res.sendStatus(204);
+
+  const { id } = req.params;
+  const sqlDelete = "DELETE FROM posts WHERE id = ?";
+  connection.query(sqlDelete, [id], (err) => {
+    if (err)
+      return res.status(500).json({ error: "Impossibile cancellare post" });
+    res.sendStatus(204);
+  });
 }
 
 module.exports = { index, show, store, update, modify, destroy };

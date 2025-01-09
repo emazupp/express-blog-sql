@@ -1,4 +1,4 @@
-const posts = require("../data/posts");
+const connection = require("../data/config");
 
 function findPostById(res, id) {
   const findedPost = posts.find((post) => post.id === id);
@@ -25,8 +25,15 @@ function invalidParamsError() {
 
 // * INDEX
 function index(req, res) {
-  const { tag } = req.query;
-  tag ? res.json(filterPostByTag(res, tag)) : res.json(posts);
+  // const { tag } = req.query;
+  // tag ? res.json(filterPostByTag(res, tag)) : res.json(posts);
+
+  const sql = "SELECT * FROM posts";
+
+  connection.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: "Query failed!" });
+    res.json(results);
+  });
 }
 
 // * SHOW

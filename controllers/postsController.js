@@ -28,9 +28,9 @@ function index(req, res) {
   // const { tag } = req.query;
   // tag ? res.json(filterPostByTag(res, tag)) : res.json(posts);
 
-  const sql = "SELECT * FROM posts";
+  const sqlIndex = "SELECT * FROM posts";
 
-  connection.query(sql, (err, results) => {
+  connection.query(sqlIndex, (err, results) => {
     if (err) return res.status(500).json({ error: "Query failed!" });
     res.json(results);
   });
@@ -43,12 +43,29 @@ function show(req, res) {
   // res.json(findedPost);
 
   const id = req.params.id;
+  let post = "";
   const sqlShow = "SELECT * FROM posts WHERE id = ?";
+  const sqlTags = `SELECT tags.*
+    FROM posts
+    INNER JOIN post_tag
+    ON post_tag.post_id = posts.id
+    INNER JOIN tags
+    ON tags.id = post_tag.tag_id
+    WHERE posts.id = ?`;
+
   connection.query(sqlShow, [id], (err, results) => {
-    if (err) return res.status(500).json({ error: "Query failed!" });
+    if (err) return res.status(500).json({ error: "Query show failed!" });
     if (results.length === 0)
       return res.status(404).json({ error: "Posts not found" });
-    res.json(results[0]);
+    post = results[0];
+
+    connection.query(sqlTags, [id], (err, resultsTags) => {
+      if (err) return res.status(500).json({ error: "Query tags failed!" });
+      console.log(resultsTags);
+      post.tags = resultsTags;
+
+      res.json(post);
+    });
   });
 }
 
